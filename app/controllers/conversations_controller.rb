@@ -1,22 +1,29 @@
 class ConversationsController < ApplicationController
+  before_action :set_project
+
   def create
-    @project = Project.find(params[:project_id])
-    @entry = @project.conversations.build(entry_params)
-    @entry.user = User.first  # replace with actual current_user in real app
+    @entry = @project.conversations.new(conversation_params)
+    @entry.user = User.first
+    @entry.entry_type = "comment"  # always a comment here
 
     if @entry.save
-      if @entry.status_change?
-        @project.update(status: @entry.content)
-      end
-      redirect_to @project
+      flash[:notice] = "Comment added successfully."
+      redirect_to project_path(@project)
     else
-      render "projects/show", status: :unprocessable_entity
+      flash[:alert] = "Failed to add comment."
+      @entries = @project.conversations.order(created_at: :desc).page(params[:page]).per(5)
+      render "projects/show"
     end
   end
 
   private
 
-  def entry_params
-    params.require(:conversation_entry).permit(:type, :content)
+  def set_project
+    @project = Project.find(params[:project_id])
   end
+
+  def conversation_params
+    params.require(:conversation).permit(:message)
+  end
+
 end

@@ -1,9 +1,32 @@
-<h1>Projects</h1>
-<ul>
-  <% @projects.each do |project| %>
-    <li>
-      <%= link_to project.name, project_path(project) %> 
-      (Status: <%= project.status %>)
-    </li>
-  <% end %>
-</ul>
+<h1 class="mb-4">Projects</h1>
+
+<table class="table table-hover table-bordered">
+  <thead class="table-light">
+    <tr>
+      <th>Name</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @projects.each do |project| %>
+      <tr>
+        <td><%= link_to project.name, project_path(project), class: "text-decoration-none fw-bold" %></td>
+        <td>
+          <span class="badge 
+            <%= case project.status
+                when "pending" then "bg-warning text-dark"
+                when "in_progress" then "bg-info text-dark"
+                when "completed" then "bg-success"
+                else "bg-secondary"
+              end %>">
+            <%= project.status.titleize %>
+          </span>
+        </td>
+        <td>
+          <%= link_to "View", project_path(project), class: "btn btn-sm btn-outline-primary" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

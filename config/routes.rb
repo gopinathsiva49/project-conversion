@@ -1,17 +1,11 @@
 Rails.application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
+root "projects#index"
 
-  root "projects#index"
-
-  resources :projects, only: [:index, :show] do
-    resources :conversations, only: [:create]
+resources :projects, only: [:index, :show, :update] do
+  member do
+    patch :update_status
   end
-  
+  resources :conversations, only: [:create]
+end
 
-  # Render dynamic PWA files from app/views/pwa/*
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

@@ -1,27 +1,61 @@
-<h1><%= @project.name %></h1>
-<p>Current Status: <%= @project.status %></p>
+<div class="container my-4">
 
-<h2>Conversation History</h2>
-<% @entries.each do |entry| %>
-  <div>
-    <strong><%= entry.type.capitalize %> by <%= entry.user.name %> at <%= entry.created_at.strftime("%Y-%m-%d %H:%M") %>:</strong>
-    <p><%= entry.content %></p>
-  </div>
-<% end %>
+  <!-- Project Title -->
+  <h1 class="mb-3"><%= @project.name %></h1>
 
-<%= paginate @entries %>
+  <!-- Current Status -->
+  <p>
+    Current Status:
+    <span class="badge bg-primary fs-6">
+      <%= @project.status.titleize %>
+    </span>
+  </p>
 
-<h3>Add New Entry</h3>
-<%= form_with(model: [@project, @entry], local: true) do |form| %>
-  <div>
-    <%= form.label :type %><br>
-    <%= form.select :type, Conversation.types.keys.map { |e| [e.titleize, e] } %>
+  <!-- Status Update Form -->
+  <div class="card my-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Change Project Status</h5>
+    </div>
+    <div class="card-body">
+      <%= form_with model: @project, url: update_status_project_path(@project), method: :patch, local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :status, "Select new status", class: "form-label" %>
+          <%= form.select :status, Project.statuses.keys.map { |s| [s.titleize, s] }, { selected: @project.status }, class: "form-select" %>
+        </div>
+        <%= form.submit "Update Status", class: "btn btn-success" %>
+      <% end %>
+    </div>
   </div>
-  <div>
-    <%= form.label :content %><br>
-    <%= form.text_area :content %>
+
+  <!-- Conversation History -->
+  <div class="mt-5">
+    <h2>Conversation History</h2>
+    <% @entries.each do |entry| %>
+      <div class="card mb-3 <%= entry.status_change? ? 'border-success' : '' %>">
+        <div class="card-body" style="<%= entry.status_change? ? 'background-color: #d1e7dd; color: #0f5132;' : '' %>">
+          <strong><%= entry.entry_type.titleize %> by <%= entry.user.name %> at <%= entry.created_at.strftime("%Y-%m-%d %H:%M") %>:</strong>
+          <p class="mb-0"><%= entry.message %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <%= paginate @entries %>
   </div>
-  <div>
-    <%= form.submit "Add Entry" %>
+
+  <!-- Add Comment Form -->
+  <div class="card mt-5">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Add a Comment</h5>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: [@project, @entry], local: true) do |form| %>
+        <div class="mb-3">
+          <%= form.label :message, "Comment", class: "form-label" %>
+          <%= form.text_area :message, rows: 4, class: "form-control" %>
+        </div>
+        <%= form.submit "Add Comment", class: "btn btn-primary" %>
+      <% end %>
+    </div>
   </div>
-<% end %>
+
+</div>
