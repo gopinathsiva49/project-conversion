@@ -1,0 +1,27 @@
+<h1><%= @project.name %></h1>
+<p>Current Status: <%= @project.status %></p>
+
+<h2>Conversation History</h2>
+<% @entries.each do |entry| %>
+  <div>
+    <strong><%= entry.type.capitalize %> by <%= entry.user.name %> at <%= entry.created_at.strftime("%Y-%m-%d %H:%M") %>:</strong>
+    <p><%= entry.content %></p>
+  </div>
+<% end %>
+
+<%= paginate @entries %>
+
+<h3>Add New Entry</h3>
+<%= form_with(model: [@project, @entry], local: true) do |form| %>
+  <div>
+    <%= form.label :type %><br>
+    <%= form.select :type, Conversation.types.keys.map { |e| [e.titleize, e] } %>
+  </div>
+  <div>
+    <%= form.label :content %><br>
+    <%= form.text_area :content %>
+  </div>
+  <div>
+    <%= form.submit "Add Entry" %>
+  </div>
+<% end %>

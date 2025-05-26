@@ -1,8 +1,8 @@
 class Conversation < ApplicationRecord
   belongs_to :project
   belongs_to :user
-  enum entry_type: { comment: "comment", status_change: "status_change" }
+  enum type: { comment: "comment", status_change: "status_change" }
   validates :content, presence: true
-  validates :entry_type, presence: true
+  validates :type, presence: true
 
 end
